@@ -1,7 +1,7 @@
 package br.com.estacionamento.parking_manager.controllers;
 
 import br.com.estacionamento.parking_manager.controllers.dtos.ParkingDTO;
-import br.com.estacionamento.parking_manager.controllers.dtos.LicensePlateDTO;
+import br.com.estacionamento.parking_manager.controllers.dtos.LicensePlate;
 import br.com.estacionamento.parking_manager.service.ParkingService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,14 +19,13 @@ public class ParkingController {
 
     @GetMapping
     public ResponseEntity<?> displayParking() {
-        return ResponseEntity.ok(parkingService.getVEHICLE());
+        return ResponseEntity.ok(parkingService.getVehicle());
     }
 
     @GetMapping("/{licensePlate}")
-    public ResponseEntity<?> getPriceToPay(String licensePlate) {
+    public ResponseEntity<?> getPriceToPay(@PathVariable String licensePlate) {
         try {
-            ParkingDTO parkingDTO = parkingService.searchVEHICLE(licensePlate).get();
-
+            ParkingDTO parkingDTO = parkingService.searchVehicle(licensePlate).orElseThrow(() -> new RuntimeException("vehicle not found"));
             parkingDTO.setMinuteCost(0.02);
             double totalPrice = parkingService.calculePriceToPay(parkingDTO);
             return ResponseEntity.ok(Map.of("totalPrice", totalPrice));
@@ -37,9 +36,9 @@ public class ParkingController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<?> saveVehicle(@Valid @RequestBody LicensePlateDTO licensePlate) {
+    public ResponseEntity<?> saveVehicle(@RequestBody @Valid LicensePlate licensePlate) {
         try {
-            ParkingDTO parkingDTO = parkingService.saveVEHICLE(licensePlate.getLicensePlateDTO());
+            ParkingDTO parkingDTO = parkingService.saveVehicle(licensePlate.getLicensePlate());
             return ResponseEntity.status(201).body(parkingDTO);
         } catch (RuntimeException e) {
             return ResponseEntity.status(400).body(Map.of("message", e.getMessage()));

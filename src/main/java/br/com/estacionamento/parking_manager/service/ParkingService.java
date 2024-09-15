@@ -15,18 +15,18 @@ import java.util.Optional;
 public class ParkingService {
     List<ParkingDTO> VEHICLE = new ArrayList<>();
 
-    public List<ParkingDTO> getVEHICLE() {
+    public List<ParkingDTO> getVehicle() {
         return VEHICLE;
     }
 
-    public Optional<ParkingDTO> searchVEHICLE(String plate) {
+    public Optional<ParkingDTO> searchVehicle(String plate) {
         return VEHICLE.stream()
                 .filter(parkingDTO -> parkingDTO.getVehicleLicensePlate().equalsIgnoreCase(plate))
                 .findFirst();
     }
 
-    public ParkingDTO saveVEHICLE(String plate) {
-        Optional<ParkingDTO> vehicleOptional = searchVEHICLE(plate);
+    public ParkingDTO saveVehicle(String plate) {
+        Optional<ParkingDTO> vehicleOptional = searchVehicle(plate);
 
         if (vehicleOptional.isPresent()) {
             throw new RuntimeException("vehicle already exist");
@@ -35,7 +35,7 @@ public class ParkingService {
         ParkingDTO parkingDTO = new ParkingDTO();
         parkingDTO.setVehicleLicensePlate(plate);
         parkingDTO.setEntryTime(LocalDateTime.now());
-        parkingDTO.setExitTime(LocalDateTime.of(LocalDate.now(), LocalTime.of(22, 0, 0)));
+        parkingDTO.setExitTime(LocalDateTime.of(LocalDate.now(), LocalTime.of(23, 59, 59)));
         VEHICLE.add(parkingDTO);
 
         return parkingDTO;
