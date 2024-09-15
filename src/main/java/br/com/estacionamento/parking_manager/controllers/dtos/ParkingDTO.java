@@ -8,24 +8,21 @@ import java.time.LocalDateTime;
 
 public class ParkingDTO {
 
-    @NotNull
-    @NotBlank
     private String VehicleLicensePlate;
+
     @NotNull
     @NotBlank
     private LocalDateTime entryTime;
+
     @NotNull
     @NotBlank
     private LocalDateTime exitTime;
+
     @NotNull
     @NotBlank
     private double minuteCost;
 
-    public ParkingDTO(String vehicleLicensePlate, LocalDateTime entryTime, LocalDateTime exitTime, double hourlyCost) {
-        VehicleLicensePlate = vehicleLicensePlate;
-        this.entryTime = entryTime;
-        this.exitTime = exitTime;
-        this.minuteCost = hourlyCost;
+    public ParkingDTO() {
     }
 
     public String getVehicleLicensePlate() {
@@ -58,9 +55,5 @@ public class ParkingDTO {
 
     public double getMinuteCost() {
         return minuteCost;
-    }
-
-    public double getTotalPrice() {
-        return Duration.between(entryTime, exitTime).toMinutes() * minuteCost;
     }
 }
