@@ -45,4 +45,14 @@ public class ParkingController {
         }
     }
 
+    @DeleteMapping
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public ResponseEntity<?> deleteVehicle(@RequestParam(name = "licensePlate") String licensePlate) {
+        try {
+            parkingService.deleteVehicle(licensePlate);
+            return ResponseEntity.status(201).body(Map.of("message", "vehicle deleted"));
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(400).body(Map.of("message", e.getMessage()));
+        }
+    }
 }

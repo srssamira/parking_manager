@@ -1,5 +1,4 @@
 package br.com.estacionamento.parking_manager.service;
-
 import br.com.estacionamento.parking_manager.controllers.dtos.ParkingDTO;
 import org.springframework.stereotype.Service;
 
@@ -10,6 +9,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class ParkingService {
@@ -43,5 +43,9 @@ public class ParkingService {
 
     public double calculePriceToPay(ParkingDTO parkingDTO) {
         return Duration.between(parkingDTO.getEntryTime(), parkingDTO.getExitTime()).toMinutes() * parkingDTO.getMinuteCost();
+    }
+
+    public void deleteVehicle(String plateToSearch) {
+        VEHICLE = VEHICLE.stream().filter(plate -> plate.getVehicleLicensePlate().equals(plateToSearch)).collect(Collectors.toList());
     }
 }
