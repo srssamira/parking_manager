@@ -1,4 +1,5 @@
 package br.com.estacionamento.parking_manager.service;
+import br.com.estacionamento.parking_manager.controllers.dtos.LicensePlate;
 import br.com.estacionamento.parking_manager.controllers.dtos.ParkingDTO;
 import org.springframework.stereotype.Service;
 
@@ -47,5 +48,16 @@ public class ParkingService {
 
     public void deleteVehicle(String plateToSearch) {
         VEHICLE = VEHICLE.stream().filter(plate -> plate.getVehicleLicensePlate().equals(plateToSearch)).collect(Collectors.toList());
+    }
+
+    public void putVehicle(String plateToSearch, ParkingDTO updatedParkingDTO) {
+        Optional<ParkingDTO> vehicleOptional = searchVehicle(plateToSearch);
+        LicensePlate licensePlate = new LicensePlate();
+        if (vehicleOptional.isPresent()) {
+            ParkingDTO vehicleOnList = vehicleOptional.get();
+            vehicleOnList.setVehicleLicensePlate(licensePlate.getLicensePlate());
+            vehicleOnList.setEntryTime(updatedParkingDTO.getEntryTime());
+            vehicleOnList.setExitTime(updatedParkingDTO.getExitTime());
+        } else throw new RuntimeException("vehicle not found");
     }
 }
