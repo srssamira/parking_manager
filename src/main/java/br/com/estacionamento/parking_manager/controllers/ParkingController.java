@@ -56,14 +56,5 @@ public class ParkingController {
         }
     }
 
-    @PutMapping("/{plateToSearch}")
-    public ResponseEntity<?> updateVehicle (@PathVariable String plateToSearch, @RequestBody @Valid ParkingDTO updateParkingDTO) {
-        try {
-            parkingService.putVehicle(plateToSearch, updateParkingDTO);
-            return ResponseEntity.status(201).body(Map.of("message", "vehicle updated"));
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(400).body(Map.of("message", "vehicle not found to update"));
-        }
-    }
 
 }
