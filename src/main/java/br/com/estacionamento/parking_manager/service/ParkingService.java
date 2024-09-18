@@ -1,12 +1,10 @@
 package br.com.estacionamento.parking_manager.service;
-import br.com.estacionamento.parking_manager.controllers.dtos.LicensePlate;
+import br.com.estacionamento.parking_manager.controllers.dtos.ExitTimeDTO;
 import br.com.estacionamento.parking_manager.controllers.dtos.ParkingDTO;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -36,17 +34,25 @@ public class ParkingService {
         ParkingDTO parkingDTO = new ParkingDTO();
         parkingDTO.setVehicleLicensePlate(plate);
         parkingDTO.setEntryTime(LocalDateTime.now());
-        parkingDTO.setExitTime(LocalDateTime.of(LocalDate.now(), LocalTime.of(23, 59, 59)));
         VEHICLE.add(parkingDTO);
 
         return parkingDTO;
     }
 
-    public double calculePriceToPay(ParkingDTO parkingDTO) {
-        return Duration.between(parkingDTO.getEntryTime(), parkingDTO.getExitTime()).toMinutes() * parkingDTO.getMinuteCost();
-    }
-
     public void deleteVehicle(String plateToSearch) {
         VEHICLE = VEHICLE.stream().filter(plate -> !plate.getVehicleLicensePlate().equals(plateToSearch)).collect(Collectors.toList());
+    }
+
+    public LocalDateTime updateVehicleExitTime(String licensePlate, ExitTimeDTO exitTimeDTO) {
+        LocalDateTime parsedExitTime = LocalDateTime.parse(exitTimeDTO.getExitTime());
+
+        if (searchVehicle(licensePlate).isEmpty()) {
+            throw new RuntimeException("vehicle does not exist");
+        }
+        else {
+            ParkingDTO vehicle = searchVehicle(licensePlate).get();
+            vehicle.setExitTime(parsedExitTime);
+            return parsedExitTime;
+        }
     }
 }

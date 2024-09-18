@@ -1,5 +1,6 @@
 package br.com.estacionamento.parking_manager.controllers;
 
+import br.com.estacionamento.parking_manager.controllers.dtos.ExitTimeDTO;
 import br.com.estacionamento.parking_manager.controllers.dtos.ParkingDTO;
 import br.com.estacionamento.parking_manager.controllers.dtos.LicensePlate;
 import br.com.estacionamento.parking_manager.service.ParkingService;
@@ -8,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.Duration;
 import java.util.Map;
 
 @RestController
@@ -23,11 +26,11 @@ public class ParkingController {
     }
 
     @GetMapping("/{licensePlate}")
-    public ResponseEntity<?> getPriceToPay(@PathVariable String licensePlate) {
+    public ResponseEntity<?> getPriceToPay(@PathVariable String licensePlate, @RequestBody @Valid ExitTimeDTO exitTimeDTO) {
         try {
             ParkingDTO parkingDTO = parkingService.searchVehicle(licensePlate).orElseThrow(() -> new RuntimeException("vehicle not found"));
             parkingDTO.setMinuteCost(0.02);
-            double totalPrice = parkingService.calculePriceToPay(parkingDTO);
+            double totalPrice = Duration.between(parkingDTO.getEntryTime(), parkingService.updateVehicleExitTime(licensePlate, exitTimeDTO)).toMinutes() * parkingDTO.getMinuteCost();
             return ResponseEntity.ok(Map.of("totalPrice", totalPrice));
         } catch (Exception e) {
             return ResponseEntity.status(400).body(Map.of("message", "vehicle not found"));
@@ -46,15 +49,22 @@ public class ParkingController {
     }
 
     @DeleteMapping
-    @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<?> deleteVehicle(@RequestParam(name = "licensePlate") String licensePlate) {
         try {
             parkingService.deleteVehicle(licensePlate);
-            return ResponseEntity.status(201).body(Map.of("message", "vehicle deleted"));
+            return ResponseEntity.status(204).build();
         } catch (RuntimeException e) {
             return ResponseEntity.status(400).body(Map.of("message", e.getMessage()));
         }
     }
 
-
+    @PatchMapping("/{licensePlate}/exit-time")
+    public ResponseEntity<?> updateExitTime(@PathVariable String licensePlate, @RequestBody @Valid ExitTimeDTO exitTimeDTO) {
+        try {
+            parkingService.updateVehicleExitTime(licensePlate, exitTimeDTO);
+            return ResponseEntity.status(200).body(Map.of("message", "success"));
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body(Map.of("message", e.getMessage()));
+        }
+    }
 }
